@@ -53,10 +53,18 @@ abstract class page {
     }
     public function __destruct()
     {
-        $this->html .= '</body></html>';
-        die($this->html);
+        $this->html .= '</body></html>';        
+        printOutput::printHtml($this->html);
     }
 }
+
+class printOutput
+{
+    static public function printHtml($inputHtml){
+    return print($inputHtml);
+    }
+} 
+
 
 class uploadform extends page
 {
