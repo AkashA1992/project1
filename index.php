@@ -63,7 +63,7 @@ class htmlTag{
         $form.='Select file to upload:';
         $form.='<input type="file" name="fileToUpload" id="fileToUpload">';
         $form.='<input type="submit" value="Upload" name="submit">';
-        $form.='</form>';
+        $form.='</form>';        
         return $form;
     }
     
@@ -95,6 +95,10 @@ class htmlTag{
         fclose($myfile);
         return $html;
       }
+      //Navigate to index.php with dynamic Class Name and File Name
+      static public function htmlHeader($filename,$classname){
+        header('Location: index.php?page='.$classname.'&filename='.$filename);
+      }
 }
 
 class uploadform extends page
@@ -109,17 +113,34 @@ class uploadform extends page
         $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
         $uploadOk = 1;
         
-        if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {        
-        header('Location: index.php?page=displayHtml&filename='.$target_file);
-               
-        }
+        $csv_mimetypes = array(
+            'text/csv',
+            'text/plain',
+            'application/csv',
+            'text/comma-separated-values',
+            'application/excel',
+            'application/vnd.ms-excel',
+            'application/vnd.msexcel',
+            'text/anytext',
+            'application/octet-stream',
+            'application/txt',
+        );
+
+        if (in_array($_FILES['fileToUpload']['type'], $csv_mimetypes)) {
+            if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {               
+            htmlTag::htmlHeader($target_file,"displayHtml");               
+            }
+        } 
+        else{
+        $this->html.="Please upload a CSV file!!!!";
+        }  
     }
 }
 //Display the output from CSV file to HTML
 class displayHtml extends page
 {
-    public function get(){
-      $this->html.=htmlTag::generateHtml();
+    public function get(){      
+      $this->html.=htmlTag::generateHtml();    
     }
 }
 ?>
